@@ -1,0 +1,102 @@
+{% extends "frame.html" %}
+{% import "macros.html" as macros %}
+
+{% block header_content %}
+
+    {{ macros.modal_confirmation(url_for('delete_task', id=task.id), 'delete') }}
+    {{ macros.modal_confirmation(url_for('archive_task', id=task.id), 'archive') }}
+    {{ macros.modal_task_form(priorities, tags, task) }}
+
+
+    <div class="dropdown ml-2">
+        <a class="btn btn-default dropdown-toggle" tabindex="0">Priority: {{ task.priority | priority_as_str }} <i class="icon icon-caret"></i></a>
+        <ul class="menu">
+            {% for priority in priorities %}
+            <li class="menu-item">
+                <a href="{{ url_for('set_task_priority', id=task.id, priority=priority.value) }}">
+                    {{ priority.value | priority_as_str }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="dropdown ml-2">
+        <a class="btn btn-default dropdown-toggle" tabindex="0">Status: {{ task.status | status_as_str }} <i class="icon icon-caret"></i></a>
+        <ul class="menu">
+            {% for status in statuses %}
+            <li class="menu-item">
+                <a href="{{ url_for('set_task_status', id=task.id, status=status.value) }}">
+                    {{ status.value | status_as_str }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="dropdown ml-2">
+        <a class="btn btn-default dropdown-toggle" tabindex="0">Actions <i class="icon icon-caret"></i></a>
+        <ul class="menu">
+            <li class="menu-item">
+                <a href="#task-form-modal">
+                    Edit
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#confirmation-delete-modal">
+                    Delete
+                </a>
+            </li>
+            {% if not task.archived %}
+            <li class="menu-item">
+                <a href="#confirmation-archive-modal">
+                    Archive
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+
+        <div class="columns">
+            <div class="column col-3 col-lg-1 col-sm-0"></div>
+            <div class="column col-6 col-lg-10 col-sm-12">
+
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item">Task: {{ task.title }}</li>
+                </ul>
+
+                <h1 class="text-center mb-1-0 mt-1-5">{{ task.title }}</h1>
+
+                {% if task.description %}
+                    <p class="pt-2 pb-2 mt-1-5">{{ task.description | prepare_text | safe }}</p>
+                {% endif %}
+
+                {{ macros.task_tags(task) }}
+
+                {% if task.comments %}
+                    <div class="divider text-center" data-content="{{ "Comments" | upper }}"></div>
+                    {% for comment in task.comments %}
+                        <div class="card rounded mb-1-0 ml-0-5 brd-0 non-expandable">
+                            <div class="card-header">
+                                <a href="{{ url_for('delete_comment', id=comment.id) }}" class="float-right"><i class="icon icon-delete"></i></a>
+                                <div class="card-title5">{{ comment.content | prepare_text | safe }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form action="{{ url_for('add_comment_to_task', id=task.id) }}" method="POST" class="mt-1-5">
+                    <div class="form-group">
+                        <textarea class="form-input" name="content" rows="5" autofocus placeholder="Leave a comment"></textarea><br />
+                        <button type="submit" class="btn btn-success input-group-btn">Comment</button>
+                    </div>
+                </form>
+            </div>
+            <div class="column col-3 col-lg-1 col-sm-0"></div>
+        </div>
+    </div>
+{% endblock %}

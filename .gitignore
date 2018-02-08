@@ -1,0 +1,4 @@
+app/data/settings.py
+app/data/data.db
+.idea
+__pycache__

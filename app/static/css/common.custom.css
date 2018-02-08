@@ -1,0 +1,56 @@
+.full-centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
+
+.task-container {
+    padding: 0 0 0.5em 0 !important;
+}
+
+.task-form-container {
+    width: 40% !important;
+    min-width: 400px !important;
+}
+
+.brd-0 {
+    border: 0 !important;
+}
+
+.pl-0-15 {
+    padding-left: 0.15em !important;
+}
+
+.pb-0-5 {
+    padding-bottom: 0.5em !important;
+}
+
+.ml-0-5 {
+    margin-left: 0.5em !important;
+}
+
+.mb-1-0 {
+    margin-bottom: 1em !important;
+}
+
+.ml-1-5 {
+    margin-left: 1.5em !important;
+}
+
+.mr-1-5 {
+    margin-right: 1.5em !important;
+}
+
+.mt-1-0 {
+    margin-top: 1em !important;
+}
+
+.mt-1-5 {
+    margin-top: 1.5em !important;
+}
+
+.non-expandable {
+    overflow: hidden !important;
+}

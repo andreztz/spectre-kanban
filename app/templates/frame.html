@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Simple Kanban Board{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static',filename='css/' + theme + '/spectre.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='css/' + theme + '/spectre-exp.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='css/spectre-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='css/common.custom.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='css/' + theme + '/custom.css') }}" rel="stylesheet">
+</head>
+<body class="pt-2">
+
+    {% block header %}
+        <header class="navbar pr-2 pl-2">
+            <section class="navbar-section">
+                <a href="{{ url_for('index') }}" class="navbar-brand mr-2">Home</a>
+                <div class="divider-vert"></div>
+                <form action="{{ url_for('task_search') }}" method="POST">
+                    <div class="input-group input-inline">
+                        <input class="form-input" placeholder="search" name="query" type="text">
+                        <button type="submit" class="btn btn-link input-group-btn"><i class="icon icon-search"></i></input>
+                    </div>
+                </form>
+            </section>
+            <section class="navbar-section">
+                {% block header_content %}{% endblock %}
+                <div class="divider-vert"></div>
+                <div class="dropdown">
+                    <a class="btn btn-default dropdown-toggle material-btn" tabindex="0">Theme <i class="icon icon-caret"></i></a>
+                    <ul class="menu">
+                        {% for theme in themes %}
+                        <li class="menu-item">
+                            <a href="{{ url_for('set_theme', theme=theme) }}">{{ theme | title }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        </header>
+        <div class="divider mb-1-0"></div>
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

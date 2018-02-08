@@ -1,0 +1,17 @@
+.task-sticker {
+    background-color: #3B3B3B !important;
+    height: 10em !important;
+    border-color: #525151 !important;
+}
+
+.task-container a {
+    color: #5779ac;
+}
+
+a.tag {
+    color: #6e767d;
+}
+
+.task-title {
+    color: #A5AAA7 !important;
+}

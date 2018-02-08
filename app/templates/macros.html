@@ -1,0 +1,112 @@
+{% macro task_tags(task) -%}
+    {% for rel in task.tags %}
+        <a href="{{ url_for('tasks_by_tag', tag_name=rel.tag.name) }}" class="tag">#{{ rel.tag.name }}</a>
+    {% endfor %}
+{%- endmacro  %}
+
+{% macro tasks_list_by_status(status, tasks) -%}
+    <div class="column col-4">
+        <div class="panel brd-0">
+            <div class="panel-header pl-0-15">
+                <div class="panel-title h4">{{ status.value | status_as_str | upper }}</div>
+            </div>
+            <div class="panel-body m-0 task-container">
+                {% for task in tasks %}
+                    {% if task.status == status.value %}
+                    <div class="card mb-2 mb-1-0 non-expandable task-sticker">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <a href="{{ url_for('task', id=task.id) }}" class="h5 task-title">{{ task.title }}</a>
+                            </div>
+                            {% if task.tags %}
+                                <div class="card-subtitle">{{ task_tags(task) }}</div>
+                            {% endif %}
+                        </div>
+                        {% if task.description %}
+                            <div class="card-body">{{ task.description | prepare_text(True) | safe }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <span class="text-gray">Nothing here</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{%  macro modal_confirmation(action, name) -%}
+    <div class="modal modal-sm" id="confirmation-{{ name }}-modal">
+        <a href="#close-confirmation-modal" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container" role="document">
+            <div class="modal-header">
+                <a href="#close-confirmation-modal" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">Are you sure?</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <p>This action can not be undone</p>
+                    <form method="POST" action="{{ action }}" id="confirmation-{{ name }}-form"></form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="confirmation-{{ name }}-form" class="btn btn-primary">Yes</button>
+                <a href="#close-confirmation-modal" class="btn btn-link" aria-label="Close">Cancel</a>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{%  macro modal_task_form(priorities, tags, task=None) -%}
+
+    {% if task %}
+        {% set title = "Edit task" %}
+        {% set action = url_for('edit_task', id=task.id) %}
+        {% set tags_str = task_tags(task) %}
+        {% set submit_btn_title = "Update" %}
+    {% else %}
+        {% set title = "New task" %}
+        {% set action = url_for('new_task') %}
+        {% set tags_str = "" %}
+        {% set submit_btn_title = "Create" %}
+    {% endif %}
+
+    <div class="modal" id="task-form-modal">
+        <a href="#close-task-form-modal" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container task-form-container" role="document">
+            <div class="modal-header">
+                <a href="#close-task-form-modal" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">{{ title }}</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <form method="POST" action="{{ action }}" id="task-form">
+
+                        <div class="form-group">
+                            <label class="form-label" for="title">Title</label>
+                            <input class="form-input" type="text" id="title" name="title" maxlength="100"
+                                   placeholder="What should be done" value="{% if task %}{{ task.title }}{% endif %}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="description">Description</label>
+                            <textarea class="form-input" id="body" name="description" placeholder="Specifying details"
+                                      rows="6">{% if task %}{{ task.description }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="tags">Tags</label>
+                            <input class="form-input" type="text" id="tags" name="tags"
+                                   placeholder="Keywords divided by comma"
+                                   value="{% for rel in task.tags %}{{ rel.tag.name }}{{ ", " if not loop.last }}{% endfor %}">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="task-form" class="btn btn-primary">{{ submit_btn_title }}</button>
+                <a href="#close-task-form-modal" class="btn btn-link" aria-label="Close">Cancel</a>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}

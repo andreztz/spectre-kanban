@@ -1,0 +1,19 @@
+{% extends "frame.html" %}
+{% import "macros.html" as macros %}
+
+{% block header_content %}
+    {{ macros.modal_task_form(priorities, tags) }}
+    <a href="#task-form-modal" class="btn btn-default">
+        <i class="icon icon-plus"></i> New task
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="columns">
+            {% for status in statuses %}
+                {{ macros.tasks_list_by_status(status, tasks) }}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

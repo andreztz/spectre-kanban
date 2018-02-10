@@ -29,7 +29,9 @@ And open your web browser in the address http://127.0.0.1:8000. If the port alre
 ```
 app/data/settings.py
 ``` 
-Also you can change path to the sqlite file there.
+There you can also:
+ * change path to the sqlite file
+ * switch to https mode
 
 Feedback
 ---

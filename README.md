@@ -32,6 +32,7 @@ app/data/settings.py
 There you can also:
  * change path to the sqlite file
  * switch to https mode
+ * enable basic authorization
 
 Feedback
 ---

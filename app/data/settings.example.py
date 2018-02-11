@@ -9,4 +9,7 @@ API_PORT = 8000
 API_SSL = False
 # API_SSL = ("/path/to/public", "/path/to/private")
 
+BASIC_AUTH = False
+# BASIC_AUTH = ("username", "password")
+
 SQLITE_FILE = "{}/app/data/data.db".format(APP_PATH)

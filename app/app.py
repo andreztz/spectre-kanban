@@ -1,8 +1,7 @@
 import logging
-import os
-import re
+from functools import wraps
 
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, url_for, abort, Response
 
 from app.utils import *
 
@@ -21,13 +20,33 @@ if not _theme or _theme not in themes:
     _theme = Theme.LIGHT
 
 
+AUTH_USERNAME = None
+AUTH_PASSWORD = None
+if BASIC_AUTH:
+    AUTH_USERNAME, AUTH_PASSWORD = BASIC_AUTH
+
+
+def auth_wrapper(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if BASIC_AUTH:
+            a = request.authorization
+            if not a or not (a.username == AUTH_USERNAME and a.password == AUTH_PASSWORD):
+                content = render_template('error/401.html', theme=_theme)
+                return Response(content, 401, {'WWW-Authenticate': 'Basic realm="Authentification Required"'})
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route('/')
+@auth_wrapper
 def index():
     return render_template('task/list.html', tasks=get_all_tasks(), tags=get_all_tags(), statuses=statuses,
                            priorities=priorities, theme=_theme, themes=themes, Status=Status)
 
 
 @app.route('/tasks/tag/<tag_name>')
+@auth_wrapper
 def tasks_by_tag(tag_name: str):
     tag = get_tag_by_name(tag_name)
     if not tag:
@@ -37,6 +56,7 @@ def tasks_by_tag(tag_name: str):
 
 
 @app.route('/tasks/search', methods=['GET', 'POST'])
+@auth_wrapper
 def task_search():
     query = ""
     tasks = []
@@ -49,6 +69,7 @@ def task_search():
 
 
 @app.route('/tasks/new', methods=["POST"])
+@auth_wrapper
 def new_task():
     title = strip_html_tags(request.form.get("title"))
     description = strip_html_tags(request.form.get("description"))
@@ -63,6 +84,7 @@ def new_task():
 
 
 @app.route('/tasks/<int:id>/edit', methods=["POST"])
+@auth_wrapper
 def edit_task(id: int):
     task = get_task_by_id(id)
     if task:
@@ -82,6 +104,7 @@ def edit_task(id: int):
 
 
 @app.route('/tasks/<int:id>')
+@auth_wrapper
 def task(id: int):
     task = get_task_by_id(id)
     if not task:
@@ -91,6 +114,7 @@ def task(id: int):
 
 
 @app.route('/tasks/<int:id>/add-comment', methods=["POST"])
+@auth_wrapper
 def add_comment_to_task(id: int):
     task = get_task_by_id(id)
     if task:
@@ -101,6 +125,7 @@ def add_comment_to_task(id: int):
 
 
 @app.route('/tasks/<int:id>/set-status/<int:status>')
+@auth_wrapper
 def set_task_status(id: int, status: int):
     task = get_task_by_id(id)
     if task and status in [s.value for s in statuses]:
@@ -111,6 +136,7 @@ def set_task_status(id: int, status: int):
 
 
 @app.route('/tasks/<int:id>/set-priority/<int:priority>')
+@auth_wrapper
 def set_task_priority(id: int, priority: int):
     task = get_task_by_id(id)
     if task and priority in [p.value for p in priorities]:
@@ -121,6 +147,7 @@ def set_task_priority(id: int, priority: int):
 
 
 @app.route('/set-theme/<theme>')
+@auth_wrapper
 def set_theme(theme: str):
     global _theme
     if theme in themes:
@@ -130,6 +157,7 @@ def set_theme(theme: str):
 
 
 @app.route('/comments/<int:id>/delete')
+@auth_wrapper
 def delete_comment(id: int):
     comment = get_comment_by_id(id)
     if comment:
@@ -138,6 +166,7 @@ def delete_comment(id: int):
 
 
 @app.route('/tasks/<int:id>/delete', methods=["POST"])
+@auth_wrapper
 def delete_task(id: int):
     task = get_task_by_id(id)
     if task:
@@ -147,6 +176,7 @@ def delete_task(id: int):
 
 
 @app.route('/tasks/<int:id>/archive', methods=["POST"])
+@auth_wrapper
 def archive_task(id: int):
     task = get_task_by_id(id)
     if task:
@@ -156,13 +186,14 @@ def archive_task(id: int):
 
 
 @app.errorhandler(404)
+@auth_wrapper
 def page_not_found(e):
-    return render_template('error/404.html', theme=_theme, themes=themes), 404
+    return render_template('error/404.html', theme=_theme), 404
 
 
 @app.errorhandler(500)
 def page_not_found(e):
-    return render_template('error/500.html', theme=_theme, themes=themes), 500
+    return render_template('error/500.html', theme=_theme), 500
 
 
 
